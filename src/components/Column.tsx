@@ -1,49 +1,66 @@
-import { CardType } from '@/components/Board';
 import { ReactSortable } from 'react-sortablejs';
-import { SetStateAction } from 'react';
+import { Card, useMutation, useStorage } from '@/app/liveblocks.config';
+import { shallow } from '@liveblocks/core';
+import NewCardForm from './forms/NewCardForm';
 
 type ColumnProps = {
   id: string;
   name: string;
-  cards: CardType[];
-  setCards: SetStateAction<any>;
 };
 
-const Column = ({ id, name, cards, setCards }: ColumnProps) => {
-  const setCardsForColumn = (sortedCards: CardType[], newColumnId: string) => {
-    setCards((prevCards: CardType[]) => {
-      const newCards = [...prevCards];
+const Column = ({ id, name }: ColumnProps) => {
+  const columnCards = useStorage<Card[]>(root => {
+    return root.cards
+      .filter(card => card.columnId === id)
+      .map(c => ({ ...c }))
+      .sort((a, b) => a.index - b.index);
+  }, shallow);
+  const updateCard = useMutation(({ storage }, index, updateData) => {
+    const card = storage.get('cards').get(index);
 
-      sortedCards.forEach((sortedCard: CardType, newIndex: number) => {
-        const foundCard = newCards.find(newCard => newCard.id === sortedCard.id);
+    if (card) {
+      for (let key in updateData) {
+        card?.set(key as keyof Card, updateData[key]);
+      }
+    }
+  }, []);
 
-        if (foundCard) {
-          foundCard.index = newIndex;
-          foundCard.columnId = newColumnId;
-        }
+  const setTasksOrderForColumn = useMutation(({ storage }, sortedCards: Card[], newColumnId) => {
+    const idsOfSortedCards = sortedCards.map(c => c.id.toString());
+
+    const allCards: Card[] = [...storage.get('cards').map(c => c.toObject())];
+
+    idsOfSortedCards.forEach((sortedCardId, colIndex) => {
+      const cardStorageIndex = allCards.findIndex(c => c.id.toString() === sortedCardId);
+      updateCard(cardStorageIndex, {
+        columnId: newColumnId,
+        index: colIndex,
       });
-
-      return newCards;
     });
-  };
+  }, []);
 
   return (
     <div className={'w-48 bg-white shadow-sm rounded-md p-2'}>
       <h3>{name}</h3>
 
-      <ReactSortable
-        list={cards}
-        setList={items => setCardsForColumn(items, id)}
-        group={'cards'}
-        className={'min-h-12'}
-        ghostClass={'opacity-40'}
-      >
-        {cards.map(card => (
-          <div key={card.id} className={'border bg-white my-2 p-4 rounded-md'}>
-            <span>{card.name}</span>
-          </div>
-        ))}
-      </ReactSortable>
+      {columnCards && (
+        <>
+          <ReactSortable
+            list={columnCards}
+            setList={items => setTasksOrderForColumn(items, id)}
+            group={'cards'}
+            className={'min-h-12'}
+            ghostClass={'opacity-40'}
+          >
+            {columnCards.map(card => (
+              <div key={card.id} className={'border bg-white my-2 p-4 rounded-md'}>
+                <span>{card.name}</span>
+              </div>
+            ))}
+          </ReactSortable>
+        </>
+      )}
+      <NewCardForm columnId={id} />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import LogoutButton from '@/components/LogoutButton';
 import LoginButton from '@/components/LoginButton';
+import Link from 'next/link';
 
 const Header = async () => {
   const session = await getServerSession(authOptions);
@@ -9,9 +10,9 @@ const Header = async () => {
   return (
     <header className={'bg-gray-200 p-4 px-8'}>
       <div className={'flex justify-between items-center'}>
-        <a href='' className={'logo'}>
+        <Link href='/' className={'logo'}>
           Trello
-        </a>
+        </Link>
 
         <div>
           {session && (
