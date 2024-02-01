@@ -37,6 +37,8 @@ export const {
   useStorage,
   useMutation,
   useRoom,
+  useSelf,
+  useOthers,
   /* ...all the other hooks you’re using... */
 } = createRoomContext<
   Presence,

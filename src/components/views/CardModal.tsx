@@ -6,9 +6,11 @@ import { BoardContext, BoardContextProps } from '@/components/BoardContext';
 import { Card, useMutation, useStorage } from '@/app/liveblocks.config';
 import { shallow } from '@liveblocks/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import DeleteWithConfirmation from '@/components/DeleteWithConfirmation';
 import CancelButton from '@/components/CancelButton';
+import { faFileLines } from '@fortawesome/free-regular-svg-icons';
+import CardDescription from '@/components/CardDescription';
 
 const CardModal = () => {
   const router = useRouter();
@@ -71,7 +73,7 @@ const CardModal = () => {
       >
         {!editMode && (
           <div className={'flex justify-between'}>
-            <h4>{card?.name}</h4>
+            <h4 className={'text-2xl'}>{card?.name}</h4>
             <button className={'text-gray-400'} onClick={() => setEditMode(true)}>
               <FontAwesomeIcon icon={faEllipsis} />
             </button>
@@ -95,7 +97,16 @@ const CardModal = () => {
           </div>
         )}
 
-        {}
+        {!editMode && (
+          <div>
+            <h2 className={'flex gap-2 items-center mt-4'}>
+              <FontAwesomeIcon icon={faFileLines} />
+              Description
+            </h2>
+
+            <CardDescription />
+          </div>
+        )}
       </div>
     </div>
   );
