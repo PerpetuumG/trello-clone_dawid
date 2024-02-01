@@ -21,3 +21,12 @@ button[type='submit'],
 input[type='text'] {
   @apply w-full block rounded-md;
 }
+
+button.btn.red {
+  @apply bg-red-500 text-white;
+}
+
+.btn.with-icon,
+button.with-icon {
+  @apply flex gap-2 items-center justify-center;
+}

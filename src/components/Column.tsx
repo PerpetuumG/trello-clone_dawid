@@ -1,10 +1,12 @@
-import { ReactSortable } from 'react-sortablejs';
 import { Card, useMutation, useStorage } from '@/app/liveblocks.config';
-import { shallow } from '@liveblocks/core';
-import NewCardForm from './forms/NewCardForm';
-import { FormEvent, useState } from 'react';
+import CancelButton from '@/components/CancelButton';
+import { faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { shallow } from '@liveblocks/core';
+import { FormEvent, useState } from 'react';
+import { ReactSortable } from 'react-sortablejs';
+import NewCardForm from '@/components/forms/NewCardForm';
+import { default as ColumnCard } from '@/components/Card';
 
 type ColumnProps = {
   id: string;
@@ -20,9 +22,9 @@ const Column = ({ id, name }: ColumnProps) => {
       .map(c => ({ ...c }))
       .sort((a, b) => a.index - b.index);
   }, shallow);
+
   const updateCard = useMutation(({ storage }, index, updateData) => {
     const card = storage.get('cards').get(index);
-
     if (card) {
       for (let key in updateData) {
         card?.set(key as keyof Card, updateData[key]);
@@ -43,9 +45,7 @@ const Column = ({ id, name }: ColumnProps) => {
 
   const setTasksOrderForColumn = useMutation(({ storage }, sortedCards: Card[], newColumnId) => {
     const idsOfSortedCards = sortedCards.map(c => c.id.toString());
-
     const allCards: Card[] = [...storage.get('cards').map(c => c.toObject())];
-
     idsOfSortedCards.forEach((sortedCardId, colIndex) => {
       const cardStorageIndex = allCards.findIndex(c => c.id.toString() === sortedCardId);
       updateCard(cardStorageIndex, {
@@ -57,9 +57,7 @@ const Column = ({ id, name }: ColumnProps) => {
 
   const handleRenameSubmit = (ev: FormEvent) => {
     ev.preventDefault();
-
     const input = (ev.target as HTMLFormElement).querySelector('input');
-
     if (input) {
       const newColumnName = input.value;
       updateColumn(id, newColumnName);
@@ -68,43 +66,33 @@ const Column = ({ id, name }: ColumnProps) => {
   };
 
   return (
-    <div className={'w-48 bg-white shadow-sm rounded-md p-2'}>
+    <div className='w-48 bg-white shadow-sm rounded-md p-2'>
       {!renameMode && (
-        <div className={'flex justify-between'}>
+        <div className='flex justify-between'>
           <h3>{name}</h3>
-          <button className={'text-gray-300'} onClick={() => setRenameMode(true)}>
+          <button className='text-gray-300' onClick={() => setRenameMode(true)}>
             <FontAwesomeIcon icon={faEllipsis} />
           </button>
         </div>
       )}
 
       {renameMode && (
-        <div className={'mb-8'}>
+        <div className='mb-8'>
           Edit name:
-          <form onSubmit={handleRenameSubmit} className={'mb-2'}>
+          <form onSubmit={handleRenameSubmit} className='mb-2'>
             <input type='text' defaultValue={name} />
-            <button type={'submit'} className={'w-full mt-2'}>
+            <button type='submit' className='w-full mt-2'>
               Save
             </button>
           </form>
           <button
             onClick={() => deleteColumn(id)}
-            className={
-              'bg-red-500 text-white p-2 flex gap-2 w-full items-center rounded-md justify-center'
-            }
+            className='bg-red-500 text-white p-2 flex gap-2 w-full items-center rounded-md justify-center'
           >
             <FontAwesomeIcon icon={faTrash} />
             Delete column
           </button>
-          <button
-            className={
-              'mt-4 w-full flex gap-2 items-center justify-center uppercase text-sm text-gray-400'
-            }
-            onClick={() => setRenameMode(false)}
-          >
-            <FontAwesomeIcon icon={faClose} />
-            Cancel edit
-          </button>
+          <CancelButton onClick={() => setRenameMode(false)} />
         </div>
       )}
       {!renameMode && columnCards && (
@@ -112,14 +100,12 @@ const Column = ({ id, name }: ColumnProps) => {
           <ReactSortable
             list={columnCards}
             setList={items => setTasksOrderForColumn(items, id)}
-            group={'cards'}
-            className={'min-h-12'}
-            ghostClass={'opacity-40'}
+            group='cards'
+            className='min-h-12'
+            ghostClass='opacity-40'
           >
             {columnCards.map(card => (
-              <div key={card.id} className={'border bg-white my-2 p-4 rounded-md'}>
-                <span>{card.name}</span>
-              </div>
+              <ColumnCard key={card.id} id={card.id} name={card.name} />
             ))}
           </ReactSortable>
         </>
