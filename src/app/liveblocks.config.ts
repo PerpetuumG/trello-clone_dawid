@@ -31,6 +31,21 @@ type Storage = {
   cards: LiveList<LiveObject<Card>>;
 };
 
+type UserMeta = {
+  id: string;
+  info: {
+    name: string;
+    email: string;
+    image: string;
+  };
+};
+
+type RoomEvent = {};
+
+type ThreadMetadata = {
+  cardId: string;
+};
+
 export const {
   RoomProvider,
   useMyPresence,
@@ -39,9 +54,16 @@ export const {
   useRoom,
   useSelf,
   useOthers,
+  useThreads,
   /* ...all the other hooks you’re using... */
-} = createRoomContext<
-  Presence,
-  Storage
-  /* UserMeta, RoomEvent, ThreadMetadata */
->(client);
+} = createRoomContext<Presence, Storage, UserMeta, RoomEvent, ThreadMetadata>(client, {
+  resolveUsers: async ({ userIds }) => {
+    const response = await fetch('/api/users?ids=' + userIds.join(','));
+    return await response.json();
+  },
+  resolveMentionSuggestions: async ({ text }) => {
+    const response = await fetch('/api/users?search=' + text);
+    const users = await response.json();
+    return users.map((user: UserMeta) => user.id);
+  },
+});
