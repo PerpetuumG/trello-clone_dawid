@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
 import { BoardContext } from '@/components/BoardContext';
+import PresenceAvatars from '@/components/PresenceAvatars';
 
 const Card = ({ id, name }: { id: string; name: string }) => {
   const params = useParams();
@@ -28,6 +29,10 @@ const Card = ({ id, name }: { id: string; name: string }) => {
       className='relative border block bg-white my-2 py-8 px-4 rounded-md'
     >
       <span>{name}</span>
+
+      <div className={'absolute bottom-1 right-1'}>
+        <PresenceAvatars presenceKey={'cardId'} presenceValue={id} />
+      </div>
     </Link>
   );
 };

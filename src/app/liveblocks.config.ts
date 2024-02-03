@@ -8,9 +8,9 @@ const client = createClient({
   throttle: 100,
 });
 
-type Presence = {
-  // cursor: { x: number, y: number } | null,
-  // ...
+export type Presence = {
+  boardId?: null | string;
+  cardId?: null | string;
 };
 
 export type Column = {
@@ -49,6 +49,7 @@ type ThreadMetadata = {
 export const {
   RoomProvider,
   useMyPresence,
+  useUpdateMyPresence,
   useStorage,
   useMutation,
   useRoom,

@@ -1,15 +1,25 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import '@liveblocks/react-comments/styles.css';
 import CardModalBody from '@/components/CardModalBody';
+import { useEffect } from 'react';
+import { useUpdateMyPresence } from '@/app/liveblocks.config';
 
 const CardModal = () => {
   const router = useRouter();
+  const params = useParams();
+  const updateMyPresence = useUpdateMyPresence();
 
   const handleBackdropClick = () => {
     router.back();
   };
+
+  useEffect(() => {
+    if (params.cardId) {
+      updateMyPresence({ cardId: params.cardId.toString() });
+    }
+  }, [params]);
 
   return (
     <>

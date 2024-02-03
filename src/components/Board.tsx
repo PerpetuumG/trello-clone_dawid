@@ -1,13 +1,13 @@
 'use client';
 
-import { RoomProvider } from '@/app/liveblocks.config';
+import { RoomProvider, useUpdateMyPresence } from '@/app/liveblocks.config';
 import { LiveList } from '@liveblocks/core';
 import { ClientSideSuspense } from '@liveblocks/react';
 import Columns from '@/components/Columns';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { updateBoard } from '@/app/actions/boardActions';
 import { useRouter } from 'next/navigation';
 import { BoardContextProvider } from '@/components/BoardContext';
@@ -15,11 +15,20 @@ import { BoardContextProvider } from '@/components/BoardContext';
 const Board = ({ id, name }: { id: string; name: string }) => {
   const [renameMode, setRenameMode] = useState(false);
   const router = useRouter();
+  const updateMyPresence = useUpdateMyPresence();
+
+  useEffect(() => {
+    updateMyPresence({ boardId: id });
+
+    return () => {
+      updateMyPresence({ boardId: null });
+    };
+  }, []);
 
   const handleNameSubmit = async (ev: FormEvent) => {
     ev.preventDefault();
 
-    const input = (ev.targe as HTMLFormElement).querySelector('input');
+    const input = (ev.target as HTMLFormElement).querySelector('input');
 
     if (input) {
       const newName = input.value;
@@ -34,7 +43,10 @@ const Board = ({ id, name }: { id: string; name: string }) => {
     <BoardContextProvider>
       <RoomProvider
         id={id}
-        initialPresence={{}}
+        initialPresence={{
+          cardId: null,
+          boardId: null,
+        }}
         initialStorage={{
           columns: new LiveList(),
           cards: new LiveList(),
