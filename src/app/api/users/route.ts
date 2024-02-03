@@ -28,5 +28,7 @@ export const GET = async (req: NextRequest) => {
     });
   }
 
-  return Response.json(users.map((u: UserType) => ({ id: u.email, name: u.name, image: u.image })));
+  return Response.json(
+    users.map((u: UserType) => ({ id: u.email, name: u.name, image: u.image, avatar: u.image })),
+  );
 };

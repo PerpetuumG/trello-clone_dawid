@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { liveblocksClient } from '@/lib/liveblocksClient';
 
-export const createBoard = async (name: string): Promise<boolean | RoomInfo> => {
+export const createBoard = async (name: string): Promise<false | RoomInfo> => {
   const liveblocksClient = new Liveblocks({
     secret: process.env.LIVEBLOCKS_SECRET_KEY || '',
   });

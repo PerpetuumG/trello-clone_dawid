@@ -7,7 +7,7 @@ import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
 import { useSelf } from '@/app/liveblocks.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faBold, faHeading, faItalic, faUnderline} from '@fortawesome/free-solid-svg-icons';
+import { faBold, faHeading, faItalic, faUnderline } from '@fortawesome/free-solid-svg-icons';
 import { Underline } from '@tiptap/extension-underline';
 
 type EditorProps = {
@@ -18,10 +18,6 @@ type EditorProps = {
 
 const DescriptionEditor = ({ doc, provider, cardId }: EditorProps) => {
   const userInfo = useSelf(me => me.info);
-
-  if (!userInfo) {
-    return;
-  }
 
   const editor = useEditor({
     extensions: [
@@ -38,7 +34,7 @@ const DescriptionEditor = ({ doc, provider, cardId }: EditorProps) => {
       }),
       CollaborationCursor.configure({
         provider,
-        user: userInfo,
+        user: userInfo || undefined,
       }),
       Underline.configure(),
     ],
